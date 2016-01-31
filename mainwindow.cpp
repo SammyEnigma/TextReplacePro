@@ -1,16 +1,25 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QRegExp>
+#include <QSettings>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    QSettings settings;
+    ui->lineEditCurrentRegex->setText(settings.value("currentRegex").toString());
+    ui->plainTextEditRegex->setPlainText(settings.value("regexes/" + ui->lineEditCurrentRegex->text()).toString());
 }
 
 MainWindow::~MainWindow()
 {
+    if (!ui->lineEditCurrentRegex->text().isEmpty()) {
+        QSettings settings;
+        settings.setValue("currentRegex", ui->lineEditCurrentRegex->text());
+        settings.setValue("regexes/"+ui->lineEditCurrentRegex->text(), ui->plainTextEditRegex->toPlainText());
+    }
     delete ui;
 }
 
