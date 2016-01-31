@@ -18,7 +18,10 @@ public:
 private slots:
     void on_pushButton_clicked();
 
+    void on_comboBoxRegexes_currentIndexChanged(int index);
+
 private:
+    int lastIndex;
     Ui::MainWindow *ui;
 };
 

@@ -8,18 +8,35 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    lastIndex = -1;
+
     QSettings settings;
-    ui->lineEditCurrentRegex->setText(settings.value("currentRegex").toString());
-    ui->plainTextEditRegex->setPlainText(settings.value("regexes/" + ui->lineEditCurrentRegex->text()).toString());
+    QStringList regexes = settings.value("regexes").toStringList();
+    for (int ii = 0; ii < regexes.size(); ii+=2) {
+        ui->comboBoxRegexes->addItem(regexes[ii], regexes[ii+1]);
+    }
+
+    int currentIndex = settings.value("currentRegex", -1).toInt();
+    if (currentIndex >= 0) {
+        ui->comboBoxRegexes->setCurrentIndex(currentIndex);
+        lastIndex = currentIndex;
+    }
 }
 
 MainWindow::~MainWindow()
 {
-    if (!ui->lineEditCurrentRegex->text().isEmpty()) {
-        QSettings settings;
-        settings.setValue("currentRegex", ui->lineEditCurrentRegex->text());
-        settings.setValue("regexes/"+ui->lineEditCurrentRegex->text(), ui->plainTextEditRegex->toPlainText());
+    ui->comboBoxRegexes->setItemData(ui->comboBoxRegexes->currentIndex(), ui->plainTextEditRegex->toPlainText());
+
+    QStringList s;
+    for (int ii = 0; ii < ui->comboBoxRegexes->count(); ++ii) {
+        s << ui->comboBoxRegexes->itemText(ii) << ui->comboBoxRegexes->itemData(ii).toString();
     }
+
+    QSettings settings;
+    settings.setValue("regexes", s);
+    settings.setValue("currentRegex", ui->comboBoxRegexes->currentIndex());
+
     delete ui;
 }
 
@@ -50,4 +67,14 @@ void MainWindow::on_pushButton_clicked()
     }
 
     ui->plainTextEditOutput->setPlainText(output);
+}
+
+void MainWindow::on_comboBoxRegexes_currentIndexChanged(int index)
+{
+    Q_ASSERT(index == ui->comboBoxRegexes->currentIndex());
+    if (lastIndex >= 0) {
+        ui->comboBoxRegexes->setItemData(lastIndex, ui->plainTextEditRegex->toPlainText());
+    }
+    ui->plainTextEditRegex->setPlainText(ui->comboBoxRegexes->currentData().toString());
+    lastIndex = index;
 }
