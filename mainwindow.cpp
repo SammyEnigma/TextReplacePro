@@ -46,7 +46,13 @@ void MainWindow::on_pushButton_clicked()
     QString input = ui->plainTextEditInput->toPlainText();
     QString output = input;
     QString regexes = ui->plainTextEditRegex->toPlainText();
+    bool skipEmptyLines = false;
     foreach (QString line, regexes.split('\n')) {
+        if (line == "skip") {
+            skipEmptyLines = true;
+            continue;
+        }
+
         QStringList s = line.split("===");
         if (s.size() != 2) {
             QMessageBox::critical(this, "", tr("Must have \"===\""));
@@ -66,6 +72,16 @@ void MainWindow::on_pushButton_clicked()
         foreach (QString line, s) {
             line.replace(regex, after);
             output += line + '\n';
+        }
+    }
+
+    if (skipEmptyLines) {
+        QStringList s = output.split('\n');
+        output = "";
+        foreach (QString line, s) {
+            if (!line.trimmed().isEmpty()) {
+                output += line + '\n';
+            }
         }
     }
 
