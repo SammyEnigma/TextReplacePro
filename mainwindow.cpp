@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QRegExp>
 #include <QSettings>
+#include <QMessageBox>
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -48,11 +49,13 @@ void MainWindow::on_pushButton_clicked()
     foreach (QString line, regexes.split('\n')) {
         QStringList s = line.split("===");
         if (s.size() != 2) {
+            QMessageBox::critical(this, "", tr("Must have \"===\""));
             return;
         }
 
         QRegExp regex(s[0]);
         if (!regex.isValid()) {
+            QMessageBox::critical(this, "", tr("Invalid regex: %1").arg(s[0]));
             return;
         }
 
