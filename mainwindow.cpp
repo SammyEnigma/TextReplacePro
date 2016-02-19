@@ -54,6 +54,9 @@ void MainWindow::on_pushButton_clicked()
         }
 
         QStringList s = line.split("===");
+        if (s.size() == 1) {
+            s << "";
+        }
         if (s.size() != 2) {
             QMessageBox::critical(this, "", tr("Must have \"===\""));
             return;
